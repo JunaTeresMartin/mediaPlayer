@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { uploadVideoAPI } from "../services/allAPI";
 
 const Add = () => {
   const [videoDetails, setVideoDetails] = useState({
@@ -9,6 +12,7 @@ const Add = () => {
     url: "",
     link: "",
   });
+  const [invalidLink, setInvalidLink] = useState(false);
   console.log(videoDetails);
   const [show, setShow] = useState(false);
 
@@ -22,10 +26,26 @@ const Add = () => {
         ...videoDetails,
         link: `https://www.youtube.com/embed/${videoId}`,
       });
+      setInvalidLink(false);
     } else {
       //invalid URL
+      setInvalidLink(true);
       setVideoDetails({ ...videoDetails, link: " " });
     }
+  };
+
+  const handleUpload = async () => {
+    //destructuring
+    const { caption, url, link } = videoDetails;
+    if (caption && url && link) {
+      //toast.success("Proceed to api")
+      const result = await uploadVideoAPI(videoDetails);
+      console.log(result);
+    } else {
+      toast.warning("Please fill the form completely");
+    }
+
+    console.log("Inside Upload handle fn");
   };
 
   return (
@@ -84,17 +104,21 @@ const Add = () => {
                 placeholder="Youtube Video Link"
               />
             </FloatingLabel>
+            {invalidLink && (
+              <div className="text-danger fw-bolder">Invalid Link</div>
+            )}
           </div>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleClose}>
+          <Button variant="primary" onClick={handleUpload}>
             Upload
           </Button>
         </Modal.Footer>
       </Modal>
+      <ToastContainer position="top-center" theme="colored" autoClose="3000" />
     </>
   );
 };
