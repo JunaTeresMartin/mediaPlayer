@@ -41,6 +41,12 @@ const Add = () => {
       //toast.success("Proceed to api")
       const result = await uploadVideoAPI(videoDetails);
       console.log(result);
+      if(result.status>=200 && result.status<300){
+        //upload sucess
+        handleClose(); //to close the modal
+        setVideoDetails({...videoDetails,caption:"",url:"",link:""})
+        toast.success(`${result.data.caption} is successfully added in your collection!`)
+      }
     } else {
       toast.warning("Please fill the form completely");
     }
